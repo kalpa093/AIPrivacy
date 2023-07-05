@@ -1,7 +1,8 @@
 from .. import Provider as PhoneNumberProvider
-
+from numpy.random import choice
 
 class Provider(PhoneNumberProvider):
+
     formats = (
         "02-####-####", # 서울
         "031-###-####", # 경기
@@ -28,5 +29,10 @@ class Provider(PhoneNumberProvider):
         "019-###-####", # 휴대폰
         "070-####-####", # 인터넷 전화
     )
+    # 각 전화번호 실제 비율로 조절 (실제로 011,016,019등은 거의 존재안함)
+    weights = [10 if format == "010-####-####" else 1 for format in formats]
 
-
+    def phone_number(self):
+        # 가중치에 따라 형식을 선택
+        format = choice(self.formats, p=[weight/sum(self.weights) for weight in self.weights])
+        return self.numerify(self.generator.parse(format))
